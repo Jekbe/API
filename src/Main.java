@@ -32,35 +32,62 @@ public class Main {
 }
 
 class ClientThread extends Thread{
-    Socket socketCLI;
-    BufferedReader in;
-    PrintStream out;
+    Socket socketCLI, socketLogin, socketRegister, socketTablica, socketChat, socketPliki;
+    BufferedReader inCLI, inLogin, inRegister, inTablica, inChat, inPliki;
+    PrintStream outCLI, outLogin, outRegister, outTablica, outChat, outPliki;
 
     ClientThread(Socket socket) throws IOException {
         socketCLI = socket;
-        in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-        out = new PrintStream(socket.getOutputStream(), true);
+        socketLogin = new Socket("localhost", 8002);
+        socketRegister = new Socket("localhost", 8003);
+        socketTablica = new Socket("localhost", 8004);
+        socketChat = new Socket("localhost", 8005);
+        socketPliki = new Socket("localhost", 8006);
+
+        inCLI = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        outCLI = new PrintStream(socket.getOutputStream(), true);
+
+        inLogin = new BufferedReader(new InputStreamReader(socketLogin.getInputStream()));
+        outLogin = new PrintStream(socketLogin.getOutputStream(), true);
+
+        inRegister = new BufferedReader(new InputStreamReader(socketRegister.getInputStream()));
+        outRegister = new PrintStream(socketRegister.getOutputStream(), true);
+
+        inTablica = new BufferedReader(new InputStreamReader(socketTablica.getInputStream()));
+        outTablica = new PrintStream(socketTablica.getOutputStream(), true);
+
+        inChat = new BufferedReader(new InputStreamReader(socketChat.getInputStream()));
+        outChat = new PrintStream(socketChat.getOutputStream(), true);
+
+        inPliki = new BufferedReader(new InputStreamReader(socketPliki.getInputStream()));
+        outPliki = new PrintStream(socketPliki.getOutputStream(), true);
+
         start();
     }
 
     public void run(){
         try {
-            String request = in.readLine();
+            String request = inCLI.readLine();
             String response = rozpoznaj(request);
 
-            out.println(response);
+            outCLI.println(response);
         } catch (IOException e){
             System.out.println("Błąd: " + e);
         } finally {
             try {
                 socketCLI.close();
+                socketLogin.close();
+                socketRegister.close();
+                socketTablica.close();
+                socketChat.close();
+                socketPliki.close();
             } catch (IOException e){
                 System.out.println("Błąd: " + e);
             }
         }
     }
 
-    private static String rozpoznaj(String request) {
+    private String rozpoznaj(String request) {
         String[] ramka = request.split(";");
         String response;
         switch (ramka[1]){
@@ -76,31 +103,44 @@ class ClientThread extends Thread{
         return response;
     }
 
-    private static String login(String request){
+    private String login(String request) {
+        String[] tab = request.split(";");
+        String data = tab[2].substring(6) + ";" + tab[3].substring(6);
+        String response;
+
+        outLogin.println(data);
+        outLogin.flush();
+
+        try {
+            response = inLogin.readLine();
+        } catch (IOException e){
+            response = "status:500";
+        }
+
+        return "typ:login;id:20;" + response;
+    }
+
+    private String register(String request){
         return "";
     }
 
-    private static String register(String request){
+    private String posty(String request){
         return "";
     }
 
-    private static String posty(String request){
+    private String chat(String request){
         return "";
     }
 
-    private static String chat(String request){
+    private String upload(String request){
         return "";
     }
 
-    private static String upload(String request){
+    private String lista(String request){
         return "";
     }
 
-    private static String lista(String request){
-        return "";
-    }
-
-    private static String download(String request){
+    private String download(String request){
         return "";
     }
 }
