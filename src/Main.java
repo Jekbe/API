@@ -89,58 +89,59 @@ class ClientThread extends Thread{
 
     private String rozpoznaj(String request) {
         String[] ramka = request.split(";");
-        String response;
-        switch (ramka[1]){
-            case "id:20" -> response = login(request);
-            case "id:10" -> response = register(request);
-            case "id:30" -> response = posty(request);
-            case "id:40" -> response = chat(request);
-            case "id:50", "id:60" -> response = upload(request);
-            case "id:70" -> response = lista(request);
-            case "id:80" -> response = download(request);
-            default -> response = "typ:nie_znany;" + ramka[1] + ";status:400";
-        }
-        return response;
+        return switch (ramka[1]) {
+            case "id:20" -> login(ramka);
+            case "id:10" -> register(ramka);
+            case "id:30" -> posty(ramka);
+            case "id:40" -> chat(ramka);
+            case "id:50", "id:60" -> upload(ramka);
+            case "id:70" -> lista(ramka);
+            case "id:80" -> download(ramka);
+            default -> "typ:nie_znany;" + ramka[1] + ";status:400";
+        };
     }
 
-    private String login(String request) {
-        String[] tab = request.split(";");
-        String data = tab[2].substring(6) + ";" + tab[3].substring(6);
+    private String login(String[] request) {
+        return "typ:login;id:20;" + communication(request, outLogin, inLogin);
+    }
+
+    private String register(String[] request){
+        return "typ:register;id:10;" + communication(request, outRegister, inRegister);
+    }
+
+    private String posty(String[] request){
+        return "typ:pobiez_posty;id:30;" + communication(request, outTablica, inTablica);
+    }
+
+    private String chat(String[] request){
+        return "typ:nowa_wiadomosc;id:40;" + communication(request, outChat, inChat);
+    }
+
+    private String upload(String[] request){
+        return "typ:wysylanie;id:50;" + communication(request, outPliki, inPliki);
+    }
+
+    private String lista(String[] request){
+        return "typ:lista_plikow;id:70;" + communication(request, outPliki, inPliki);
+    }
+
+    private String download(String[] request){
+        return "typ:pobierz_plik;id:80;" + communication(request, outPliki, inPliki);
+    }
+
+    private String communication(String[] request, PrintStream out, BufferedReader in) {
+        String data = request[2].substring(6) + ";" + request[3].substring(6);
         String response;
 
-        outLogin.println(data);
-        outLogin.flush();
+        out.println(data);
+        out.flush();
 
-        try {
-            response = inLogin.readLine();
+        try{
+            response = in.readLine();
         } catch (IOException e){
             response = "status:500";
         }
 
-        return "typ:login;id:20;" + response;
-    }
-
-    private String register(String request){
-        return "";
-    }
-
-    private String posty(String request){
-        return "";
-    }
-
-    private String chat(String request){
-        return "";
-    }
-
-    private String upload(String request){
-        return "";
-    }
-
-    private String lista(String request){
-        return "";
-    }
-
-    private String download(String request){
-        return "";
+        return response;
     }
 }
