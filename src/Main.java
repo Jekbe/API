@@ -13,10 +13,12 @@ public class Main {
     public static void main(String[] args) {
         Thread konsola = new Thread(() -> {
             Scanner scanner = new Scanner(System.in);
-            switch (scanner.nextLine()) {
-                case "exit" -> run = false;
-                case "lista" -> list.forEach(System.out::println);
-                default -> System.out.println("Nieznana komenda");
+            while (run) {
+                switch (scanner.nextLine()) {
+                    case "exit" -> run = false;
+                    case "lista" -> list.forEach(System.out::println);
+                    default -> System.out.println("Nieznana komenda");
+                }
             }
         });
         konsola.start();
