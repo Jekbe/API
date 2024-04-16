@@ -25,6 +25,7 @@ public class Main {
         try (ServerSocket socketCLI = new ServerSocket(8001)){
             System.out.println("Serwer działa");
             while (run){
+                System.out.println("Oczekiwanie na klienta");
                 Socket socket = socketCLI.accept();
                 System.out.println("Nowy klient");
 
@@ -32,7 +33,7 @@ public class Main {
                 list.add(thread);
             }
         }catch (IOException e){
-            System.out.println("Błąd: " + e);
+            System.out.println("Błąd: Odrzucono połączenie " + e);
         }
     }
 }
@@ -45,9 +46,9 @@ class ClientThread extends Thread{
     ClientThread(Socket socket) throws IOException {
         socketCLI = socket;
         socketLogin = new Socket("localhost", 8002);
-        socketTablica = new Socket("localhost", 8004);
-        socketChat = new Socket("localhost", 8005);
-        socketPliki = new Socket("localhost", 8006);
+        socketTablica = new Socket("localhost", 8003);
+        socketChat = new Socket("localhost", 8004);
+        socketPliki = new Socket("localhost", 8005);
 
         inCLI = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         outCLI = new PrintStream(socket.getOutputStream(), true);
@@ -70,7 +71,9 @@ class ClientThread extends Thread{
     public void run(){
         try {
             String request = inCLI.readLine();
+            System.out.println("API otrzymało ramkę: " + request);
             String response = rozpoznaj(request);
+            System.out.println("API otrzymało odpowiedź: " + response);
 
             outCLI.println(response);
         } catch (IOException e){
@@ -105,10 +108,12 @@ class ClientThread extends Thread{
     private String login(String request) {
         outLogin.println(request);
         outLogin.flush();
+        System.out.println("Login przetwarza informację");
 
         try {
             return "typ:login;id:20;" + inLogin.readLine();
         } catch (IOException e){
+            System.out.println("Błąd: login " + e);
             return "typ:login;id:20;status:500";
         }
     }
@@ -116,10 +121,12 @@ class ClientThread extends Thread{
     private String register(String request){
         outLogin.println(request);
         outLogin.flush();
+        System.out.println("Rejestracja przetwarza informację");
 
         try {
             return "typ:register;id:10;" + inLogin.readLine();
         } catch (IOException e){
+            System.out.println("Błąd: rejestracja " + e);
             return "typ:register;id:10;status:500";
         }
     }
@@ -127,10 +134,12 @@ class ClientThread extends Thread{
     private String posty(String request){
         outTablica.println(request);
         outTablica.flush();
+        System.out.println("Posty przetwarza informację");
 
         try {
             return "typ:pobiez_posty;id:30;" + inTablica.readLine();
         } catch (IOException e){
+            System.out.println("Błąd: posty " + e);
             return "typ:pobiez_posty;id:30;status:500";
         }
     }
@@ -138,10 +147,12 @@ class ClientThread extends Thread{
     private String chat(String request){
         outChat.println(request);
         outChat.flush();
+        System.out.println("Chat przetwarza informację");
 
         try {
             return "typ:nowa_wiadomosc;id:40;" + inChat.readLine();
         } catch (IOException e){
+            System.out.println("Błąd: chat " + e);
             return "typ:nowa_wiadomosc;id:40;status:500";
         }
     }
@@ -149,10 +160,12 @@ class ClientThread extends Thread{
     private String upload(String request){
         outPliki.println(request);
         outPliki.flush();
+        System.out.println("Wysyłanie przetwarza informację");
 
         try {
             return "typ:wysylanie;id:50;" + inPliki.readLine();
         } catch (IOException e){
+            System.out.println("Błąd: wysyłanie " + e);
             return "typ:wysylanie;id:50;status:500";
         }
     }
@@ -160,10 +173,12 @@ class ClientThread extends Thread{
     private String lista(String request){
         outPliki.println(request);
         outPliki.flush();
+        System.out.println("Lista przetwarza informację");
 
         try {
             return "typ:lista_plikow;id:70;" + inPliki.readLine();
         } catch (IOException e){
+            System.out.println("Błąd: lista " + e);
             return "typ:lista_plikow;id:70;status:500";
         }
     }
@@ -171,10 +186,12 @@ class ClientThread extends Thread{
     private String download(String request){
         outPliki.println(request);
         outPliki.flush();
+        System.out.println("Pobieranie przetwarza informację");
 
         try {
             return "typ:pobierz_plik;id:80;" + inPliki.readLine();
         } catch (IOException e){
+            System.out.println("Błąd: pobieranie " + e);
             return "typ:pobierz_plik;id:80;status:500";
         }
     }
