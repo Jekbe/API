@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Scanner;
 
 public class Main {
-    private static ServerSocket socketCLI;
     private static final List<ClientThread> list = new ArrayList<>();
     private static boolean run = true;
 
@@ -23,8 +22,7 @@ public class Main {
         });
         konsola.start();
 
-        try {
-            socketCLI = new ServerSocket(8001);
+        try (ServerSocket socketCLI = new ServerSocket(8001)){
             System.out.println("Serwer działa");
             while (run){
                 Socket socket = socketCLI.accept();
@@ -35,12 +33,6 @@ public class Main {
             }
         }catch (IOException e){
             System.out.println("Błąd: " + e);
-        } finally {
-            try {
-                socketCLI.close();
-            } catch (IOException e){
-                System.out.println("Błąd: " + e);
-            }
         }
     }
 }
